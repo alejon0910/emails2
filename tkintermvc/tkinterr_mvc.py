@@ -1,7 +1,11 @@
 import re
 import tkinter as tk
 from tkinter import ttk
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+from model import EmailAddress
 
+engine = create_engine('sqlite:///emails.sqlite', echo=True)
 
 class Model:
     def __init__(self, email):
@@ -29,8 +33,13 @@ class Model:
         Save the email into a file
         :return:
         """
-        with open('emails.txt', 'a') as f:
-            f.write(self.email + '\n')
+        with Session(engine) as sess:
+            email_address = EmailAddress(email=self.email)
+            sess.add(email_address)
+            sess.commit()
+
+            return "saved"
+
 
 class View(ttk.Frame):
     def __init__(self, parent):
@@ -130,6 +139,7 @@ class Controller:
             # show an error message
             self.view.show_error(error)
 
+
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -152,4 +162,4 @@ class App(tk.Tk):
 
 if __name__ == '__main__':
     app = App()
-    app.mainloop()     
+    app.mainloop()

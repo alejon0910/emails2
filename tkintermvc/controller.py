@@ -1,10 +1,14 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from model import EmailAddress
+from tkinterr_mvc import View
+
 
 class Controller:
-    def __init__(self):
+    def __init__(self, model, view):
         self.engine = create_engine('sqlite:///emails.sqlite', echo=True)
+        self.model = model
+        self.view = view
 
     def save(self, email):
         """
@@ -18,7 +22,10 @@ class Controller:
                 sess.add(email_address)
                 sess.commit()
 
+                self.view.show_success(f'The email {email} saved!')
+
                 return "saved"
+
 
         except ValueError as error:
             # show an error message
